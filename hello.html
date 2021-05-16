@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
+
+<body>
+    <button id="create">Create a room</button><br><br>
+    <input type="text" id="roomId_input" placeholder="enter room id"><button id="join">Join a room</button>
+    <script>
+        let createButton = document.getElementById("create");
+        let joinButton = document.getElementById("join");
+        let roomId_input = document.getElementById("roomId_input");
+
+        let roomId = 'id' + (new Date()).getTime();
+        
+        createButton.onclick = () => { window.location = `http://localhost:3009/${roomId}` };
+        joinButton.onclick = () => { window.location = `http://localhost:3009/${roomId_input.value}` };
+    </script>
+</body>
+
+</html>
