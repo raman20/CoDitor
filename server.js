@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/:roomId', (req, res) => {
-    res.render(__dirname + '/index.ejs', { roomId: req.params.roomId });
+    res.render(__dirname + '/app.ejs', { roomId: req.params.roomId });
 })
 
 http.listen(port, () => {
@@ -22,8 +22,9 @@ http.listen(port, () => {
 
 io.on('connection', (socket) => {
 
-    socket.on('join room', (ROOM_ID) => {
+    socket.on('join room', (ROOM_ID, userId) => {
         socket.join(ROOM_ID);
+        socket.to(ROOM_ID).emit('user connected', userId);
     })
 
     socket.on('new message', (e, ROOM_ID) => {
@@ -31,6 +32,7 @@ io.on('connection', (socket) => {
         socket.to(ROOM_ID).emit('message', e)
     });
 });
+
 
 io.on('disconnect', (evt) => {
     log('some people left')

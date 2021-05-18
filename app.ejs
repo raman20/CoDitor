@@ -1,18 +1,22 @@
 <html>
-<title>Realtime Editor/Collaboration</title>
-<script>
-    var ROOM_ID = "<%= roomId %>"
-</script>
+
+<head>
+    <title>Realtime Editor/Collaboration</title>
+    <script>
+        var ROOM_ID = "<%= roomId %>"
+    </script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+</head>
 
 <body>
     <h3>Realtime Editor/Collaboration</h3>
     <p id="share"></p>
     <div>
-        <textarea rows="30" cols="50" id="editor" style="background-color:dimgrey;color:white"
+        <textarea rows="30" cols="50" id="editor" style="background-color:rgb(10, 0, 0);color:white"
             placeholder="Type Your Text..."></textarea>
     </div>
-    <video id="my_video" width="100" height="100" autoplay></video>
-    <img id="incoming_video" />
+    <video id="my_video" width="100" height="100"></video>
+    <video id="incoming_video" width="100" height="100"></video>
 
     <script src="./socket.io/socket.io.js"></script>
     <script>
@@ -22,7 +26,45 @@
     <script>
         var socket = io(`http://localhost:3009/`);
 
-        socket.emit('join room', ROOM_ID);
+        const my_peer = new Peer();
+
+        my_peer.on('open', (id) => {
+            socket.emit('join room', ROOM_ID, id);
+        })
+
+
+        let my_video = document.querySelector("#my_video");
+        let incoming_video = document.querySelector('#incoming_video');
+
+        incoming_video.addEventListener('loadedmetadata', () => {
+            incoming_video.play()
+        })
+
+        my_video.addEventListener('loadedmetadata', () => { my_video.play(); });
+
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        }).then((stream) => {
+
+            my_video.srcObject = stream;
+
+            my_peer.on("call", (call) => {
+                call.answer(stream);
+                call.on('stream', (incomingStream) => {
+                    incoming_video.srcObject = incomingStream;
+                })
+            })
+
+
+            socket.on('user connected', (userId) => {
+                const call = my_peer.call(userId, stream);
+                call.on('stream', (answerStream) => {
+                    incoming_video.srcObject = answerStream;
+                })
+            })
+        })
+
         function getEl(id) {
             return document.getElementById(id)
         }
