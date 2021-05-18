@@ -1,0 +1,43 @@
+<html>
+<title>Realtime Editor/Collaboration</title>
+<script>
+    var ROOM_ID = "<%= roomId %>"
+</script>
+
+<body>
+    <h3>Realtime Editor/Collaboration</h3>
+    <p id="share"></p>
+    <div>
+        <textarea rows="30" cols="50" id="editor" style="background-color:dimgrey;color:white"
+            placeholder="Type Your Text..."></textarea>
+    </div>
+    <video id="my_video" width="100" height="100" autoplay></video>
+    <img id="incoming_video" />
+
+    <script src="./socket.io/socket.io.js"></script>
+    <script>
+        let share = document.getElementById("share");
+        share.innerText = `share room id -> ${ROOM_ID}`;
+    </script>
+    <script>
+        var socket = io(`http://localhost:3009/`);
+
+        socket.emit('join room', ROOM_ID);
+        function getEl(id) {
+            return document.getElementById(id)
+        }
+        const editor = getEl("editor")
+
+        editor.addEventListener("keyup", (evt) => {
+            const text = editor.value
+            //socket.send(text)
+            socket.emit("new message", text, ROOM_ID);
+        })
+
+        socket.on('message', (data) => {
+            editor.value = data
+        })
+    </script>
+</body>
+
+</html>
