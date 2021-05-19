@@ -104,7 +104,8 @@
                 alert("ERROR -> \n*****Please select a language*****\n*****Please write some code*****");
             }
             else {
-                loading_gif.setAttribute('src', 'loading.gif')
+                loading_gif.removeAttribute('hidden');
+                //loading_gif.setAttribute('src', 'loading.gif')
                 socket.emit("code run", ROOM_ID, editor.value, lang_select[lang_select.selectedIndex].id, lang_select.value);
             }
         }
