@@ -49,7 +49,7 @@
                 placeholder="Your output" disabled></textarea>
         </div>
         <div class="output">
-            <img id="loading" width="50px" height="50px"/>
+            <img id="loading" src="loading.gif" width="50px" height="50px" hidden=""/>
             <button id="run"> Run </button>
         </div>
     </div>
@@ -110,11 +110,13 @@
         }
 
         socket.on("loading", (e) => {
-            loading_gif.setAttribute('src', 'loading.gif');
+            //loading_gif.setAttribute('src', 'loading.gif');
+            loading_gif.removeAttribute('hidden');
         })
 
         socket.on("code response", function (codeResp) {
-            loading_gif.removeAttribute("src");
+            //loading_gif.removeAttribute("src");
+            loading_gif.setAttribute('hidden', '');
             output.value = `\nOutput -> ${codeResp["output"]} \n\nmemory -> ${codeResp["memory"]} \ntime taken -> ${codeResp["cpuTime"]}`;
         })
 
