@@ -91,6 +91,14 @@
         let output = document.querySelector("#output");
         let loading_gif = document.querySelector("#loading");
 
+        incoming_video.addEventListener('loadedmetadata', () => {
+            incoming_video.play()
+        })
+
+        my_video.addEventListener('loadedmetadata', () => { 
+            my_video.play(); 
+        });
+
         run.onclick = () => {
             if (lang_select.value == "" || editor.value == "") {
                 alert("*****Please select a language*****\n*****Please write some code*****");
@@ -103,14 +111,8 @@
 
         socket.on("code response", function (codeResp) {
             loading_gif.removeAttribute("src");
-            output.value = `\nOutput -> ${codeResp["output"]} \nmemory -> ${codeResp["memory"]} \ntime taken -> ${codeResp["cpuTime"]}`;
+            output.value = `\nOutput -> ${codeResp["output"]} \n\nmemory -> ${codeResp["memory"]} \ntime taken -> ${codeResp["cpuTime"]}`;
         })
-
-        incoming_video.addEventListener('loadedmetadata', () => {
-            incoming_video.play()
-        })
-
-        my_video.addEventListener('loadedmetadata', () => { my_video.play(); });
 
         navigator.mediaDevices.getUserMedia({
             video: true,
