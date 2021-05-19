@@ -49,7 +49,7 @@
                 placeholder="Your output" disabled></textarea>
         </div>
         <div class="output">
-            <img id="loading" src="loading.gif" width="50px" height="50px" hidden=""/>
+            <img id="loading" src="loading.gif" width="50px" height="50px" hidden="" />
             <button id="run"> Run </button>
         </div>
     </div>
@@ -67,7 +67,18 @@
     <script>
         var socket = io();
 
-        const my_peer = new Peer();
+        const my_peer = new Peer({
+            config: {
+                'iceServers': [
+                    { url: 'stun4.l.google.com:19302' },
+                    {
+                        url: 'turn:turn.bistri.com:80',
+                        credential: 'homeo',
+                        username: 'homeo'
+                    }
+                ]
+            }
+        });
 
         my_peer.on('open', (id) => {
             socket.emit('join room', ROOM_ID, id);
@@ -95,8 +106,8 @@
             incoming_video.play()
         })
 
-        my_video.addEventListener('loadedmetadata', () => { 
-            my_video.play(); 
+        my_video.addEventListener('loadedmetadata', () => {
+            my_video.play();
         });
 
         run.onclick = () => {
