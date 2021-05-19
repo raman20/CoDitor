@@ -39,12 +39,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('code run', (ROOM_ID, script, lang, version) => {
+        
+        socket.to(ROOM_ID).emit('loading',1);
+        
         codeObj['script'] = script;
         codeObj['language'] = lang;
         codeObj['versionIndex'] = version;
 
 
-        console.table(codeObj);
+        
 
         request({
             url: 'https://api.jdoodle.com/v1/execute',

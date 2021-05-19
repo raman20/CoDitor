@@ -101,7 +101,7 @@
 
         run.onclick = () => {
             if (lang_select.value == "" || editor.value == "") {
-                alert("*****Please select a language*****\n*****Please write some code*****");
+                alert("ERROR -> \n*****Please select a language*****\n*****Please write some code*****");
             }
             else {
                 loading_gif.setAttribute('src', 'loading.gif')
@@ -109,6 +109,10 @@
             }
         }
 
+        socket.on("loading", (e) => {
+            loading_gif.setAttribute('src', 'loading.gif');
+        })
+        
         socket.on("code response", function (codeResp) {
             loading_gif.removeAttribute("src");
             output.value = `\nOutput -> ${codeResp["output"]} \n\nmemory -> ${codeResp["memory"]} \ntime taken -> ${codeResp["cpuTime"]}`;
