@@ -12,6 +12,7 @@ const codeObj = {
 }
 
 app.set('view engine', 'ejs');
+app.use(express.static('static'))
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/hello.html');
