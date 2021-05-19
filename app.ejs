@@ -6,17 +6,57 @@
         var ROOM_ID = "<%= roomId %>"
     </script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <style>
+        .main {
+            float: left;
+        }
+
+        video {
+            float: top;
+            width: 200px;
+            height: 200px;
+        }
+
+        .editor,
+        .output {
+            float: top;
+        }
+    </style>
 </head>
 
 <body>
     <h3>Realtime Editor/Collaboration</h3>
     <p id="share"></p>
-    <div>
-        <textarea rows="30" cols="50" id="editor" style="background-color:rgb(10, 0, 0);color:white"
-            placeholder="Type Your Text..."></textarea>
+    <div class="main">
+        <div class="editor">
+            <select id="langs">
+                <option id="null" value="" selected>select lang.</option>
+                <option id="c" value="4">C</option>
+                <option id="cpp14" value="2">C++</option>
+                <option id="java" value="3">Java JDK 14</option>
+                <option id="python3" value="3">Python 3</option>
+            </select>
+        </div>
+        <div class="editor">
+            <textarea rows="30" cols="50" id="editor" style="background-color:rgb(255, 255, 255);color:rgb(0, 0, 0)"
+                placeholder="Type Your Text..."></textarea>
+        </div>
     </div>
-    <video id="my_video" width="100" height="100"></video>
-    <video id="incoming_video" width="100" height="100"></video>
+
+    <div class="main">
+        <div class='output'>
+            <textarea rows="30" cols="50" id="output" style="background-color:rgb(255, 255, 255);color:rgb(0, 0, 0)"
+                placeholder="Your output" disabled></textarea>
+        </div>
+        <div class="output">
+            <button id="run"> Run </button>
+        </div>
+    </div>
+
+    <div class="main">
+        <video id="my_video" muted></video>
+        <video id="incoming_video"></video>
+    </div>
 
     <script src="./socket.io/socket.io.js"></script>
     <script>
@@ -24,7 +64,7 @@
         share.innerText = `share room id -> ${ROOM_ID}`;
     </script>
     <script>
-        var socket = io(`http://localhost:3009/`);
+        var socket = io(`http://localhost:3505/`);
 
         const my_peer = new Peer();
 
@@ -32,9 +72,35 @@
             socket.emit('join room', ROOM_ID, id);
         })
 
+        function getEl(id) {
+            return document.getElementById(id)
+        }
+        const editor = getEl("editor")
+
+        editor.addEventListener("keyup", (evt) => {
+            const text = editor.value
+            //socket.send(text)
+            socket.emit("new message", text, ROOM_ID);
+        })
 
         let my_video = document.querySelector("#my_video");
         let incoming_video = document.querySelector('#incoming_video');
+        let run = document.querySelector("#run");
+        let lang_select = document.querySelector("#langs");
+        let output = document.querySelector("#output");
+
+        run.onclick = () => {
+            if (lang_select.value == "" || editor.value == "") {
+                alert("*****Please select a language*****\n*****Please write some code*****");
+            }
+            else {
+                socket.emit("code run", ROOM_ID, editor.value, lang_select[lang_select.selectedIndex].id , lang_select.value);
+            }
+        }
+
+        socket.on("code response", function (codeResp) {
+            output.value = `\nOutput -> ${codeResp["output"]} \nmemory -> ${codeResp["memory"]} \ntime taken -> ${codeResp["cpuTime"]}`;
+        })
 
         incoming_video.addEventListener('loadedmetadata', () => {
             incoming_video.play()
@@ -63,17 +129,6 @@
                     incoming_video.srcObject = answerStream;
                 })
             })
-        })
-
-        function getEl(id) {
-            return document.getElementById(id)
-        }
-        const editor = getEl("editor")
-
-        editor.addEventListener("keyup", (evt) => {
-            const text = editor.value
-            //socket.send(text)
-            socket.emit("new message", text, ROOM_ID);
         })
 
         socket.on('message', (data) => {
