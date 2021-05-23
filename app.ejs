@@ -65,7 +65,7 @@
         share.innerText = `share room id -> ${ROOM_ID}`;
     </script>
     <script>
-        var socket = io();
+        var socket = io("https://codit.herokuapp.com");
 
         const my_peer = new Peer({
             config: {
