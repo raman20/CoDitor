@@ -22,11 +22,13 @@ app.get('/:roomId', (req, res) => {
     res.render(__dirname + '/app.ejs', { roomId: req.params.roomId });
 })
 
+/*
 // -------------------------------for ssl validation----------------------------------------
 app.get('/.well-known/pki-validation/200A76DA95C2B446602C749FBC036560.txt', (req, res) => {
     res.sendFile(__dirname + '/200A76DA95C2B446602C749FBC036560.txt');
 })
 //------------------------------------------------------------------------------------------
+*/
 
 http.listen(port, () => {
     log(`server listening on port ${port}`);
