@@ -68,7 +68,7 @@
         var socket = io();
 
         const my_peer = new Peer(undefined, {
-            host: "/peerserver",
+            host: "https://codit.herokuapp.com/peerserver",
             port: '9090',
             config: {'iceServers': [
                 { url: 'stun:numb.viagenie.ca' },
