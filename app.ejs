@@ -67,18 +67,7 @@
     <script>
         var socket = io();
 
-        const my_peer = new Peer({
-            config: {
-                'iceServers': [
-                    { url: 'stun:stun4.l.google.com:19302' },
-                    {
-                        url: 'turn:turn.bistri.com:80',
-                        credential: 'homeo',
-                        username: 'homeo'
-                    }
-                ]
-            }
-        });
+        const my_peer = new Peer();
 
         my_peer.on('open', (id) => {
             socket.emit('join room', ROOM_ID, id);
