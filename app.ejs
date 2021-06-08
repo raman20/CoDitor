@@ -196,7 +196,7 @@
 
         leave.onclick = () => {
             socket.emit('leave-meeting', ROOM_ID);
-            window.location = "http://" + window.location.host + '/end';
+            window.location = "https://" + window.location.host + '/end';
         }
 
         socket.on("loading", (e) => {
