@@ -17,9 +17,9 @@
         let roomId_input = document.getElementById("roomId_input");
 
         let roomId = 'id' + (new Date()).getTime();
-        
-        createButton.onclick = () => { window.location = `${window.location.href}${roomId}` };
-        joinButton.onclick = () => { window.location = `${window.location.href}${roomId_input.value}` };
+
+        createButton.onclick = () => { window.location = `${window.location.href}join/${roomId}` };
+        joinButton.onclick = () => { window.location = `${window.location.href}join/${roomId_input.value}` };
     </script>
 </body>
 
