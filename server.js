@@ -12,14 +12,18 @@ const codeObj = {
 }
 
 app.set('view engine', 'ejs');
-app.use(express.static('static'))
+app.use(express.static('static'));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/hello.html');
 })
 
-app.get('/:roomId', (req, res) => {
+app.get('/join/:roomId', (req, res) => {
     res.render(__dirname + '/app.ejs', { roomId: req.params.roomId });
+})
+
+app.get('/end', (req, res) => {
+    res.sendFile(__dirname + '/end.html');
 })
 
 /*
@@ -34,6 +38,7 @@ http.listen(port, () => {
     log(`server listening on port ${port}`);
 });
 
+
 io.on('connection', (socket) => {
 
     socket.on('join room', (ROOM_ID, userId) => {
@@ -47,15 +52,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('code run', (ROOM_ID, script, lang, version) => {
-        
-        socket.to(ROOM_ID).emit('loading',1);
-        
+
+        socket.to(ROOM_ID).emit('loading', 1);
+
         codeObj['script'] = script;
         codeObj['language'] = lang;
         codeObj['versionIndex'] = version;
 
 
-        
+
 
         request({
             url: 'https://api.jdoodle.com/v1/execute',
@@ -66,6 +71,12 @@ io.on('connection', (socket) => {
                 console.table(body);
                 io.in(ROOM_ID).emit('code response', body);
             });
+    })
+
+    socket.on('leave-meeting', (ROOM_ID) => {
+        socket.leave(ROOM_ID);
+        socket.emit('left');
+        console.log(ROOM_ID + " -> someone left");
     })
 });
 
