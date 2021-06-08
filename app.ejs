@@ -7,63 +7,142 @@
     </script>
     <script src="peer.js"></script>
     <style>
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0px;
+        }
+
         .main {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* left section */
+
+        .left-section {
+            flex: 1;
+            /*border: 1px solid black;*/
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            margin: 2.5px;
+        }
+
+        #lang {
             float: left;
+            width: 100px;
         }
 
-        video {
-            float: top;
-            width: 200px;
-            height: 200px;
+        #run_code {
+            float: left;
+            width: 100px;
+            height: 30px;
         }
 
-        .editor,
+        #loading {
+            width: 30px;
+            height: 30px;
+        }
+
+        .editor {
+            flex: 3;
+            border-radius: 5px;
+        }
+
         .output {
-            float: top;
+            flex: 1;
+            border-radius: 5px;
+            background-color: white;
         }
+
+        .output,
+        .editor,
+        #langs {
+            margin: 2px;
+        }
+
+        /* --------------- */
+
+        /*---right section---*/
+
+        .right-section {
+            flex: 1;
+            /*border: 1px solid red;*/
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            margin: 2.5px;
+        }
+
+        .video-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .my_vid,
+        .incomming_vid {
+            flex: 1;
+            width: 50%;
+            height: 50%;
+            border: 1px solid blueviolet;
+            background-color: black;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-evenly;
+            margin-top: 0.8px;
+            margin-bottom: 0.8px;
+        }
+
+
+        .controls,
+        .video-section {
+            margin: 2px;
+        }
+
+        /* ----------------- */
+
     </style>
 </head>
 
 <body>
-    <h3>Realtime Editor/Collaboration</h3>
-    <p id="share"></p>
     <div class="main">
-        <div class="editor">
-            <select id="langs">
+        <div class="left-section">
+            <select id="lang">
                 <option id="null" value="" selected>select lang.</option>
                 <option id="c" value="4">C</option>
                 <option id="cpp14" value="2">C++</option>
                 <option id="java" value="3">Java JDK 14</option>
                 <option id="python3" value="3">Python 3</option>
             </select>
+            <textarea class="editor" placeholder="please write your code"></textarea>
+            <textarea class="output" placeholder="output" disabled></textarea>
+            <div class="code-control">
+                <button id="run_code">Run Code</button>
+                <img id="loading" src="/loading.gif" hidden />
+            </div>
         </div>
-        <div class="editor">
-            <textarea rows="30" cols="50" id="editor" style="background-color:rgb(255, 255, 255);color:rgb(0, 0, 0)"
-                placeholder="Type Your Text..."></textarea>
+        <div class="right-section">
+            <div class="video-section">
+                <video class="my_vid" poster="/dp.jpeg" muted></video>
+                <video class="incomming_vid" poster="/dp.jpeg"></video>
+            </div>
+            <div class="controls">
+                <button title="mute/unmute" id="audio-off"><img src="/icons/mic_on.png" alt="mic-on" /></button>
+                <button title="leave call" id="leave"><img src="/icons/call_end.png" alt="call-end" /></button>
+                <button title="camera on/off" id="video-off"><img src="/icons/videocam_on.png" alt="vid-on" /></button>
+            </div>
         </div>
     </div>
-
-    <div class="main">
-        <div class='output'>
-            <textarea rows="30" cols="50" id="output" style="background-color:rgb(255, 255, 255);color:rgb(0, 0, 0)"
-                placeholder="Your output" disabled></textarea>
-        </div>
-        <div class="output">
-            <img id="loading" src="loading.gif" width="50px" height="50px" hidden="" />
-            <button id="run"> Run </button>
-        </div>
-    </div>
-
-    <div class="main">
-        <video id="my_video" muted></video>
-        <video id="incoming_video"></video>
-    </div>
-
+    
     <script src="./socket.io/socket.io.js"></script>
-    <script>
-        let share = document.getElementById("share");
-        share.innerText = `share room id -> ${ROOM_ID}`;
-    </script>
     <script>
         var socket = io();
 
@@ -78,23 +157,23 @@
             socket.emit('join room', ROOM_ID, id);
         })
 
-        function getEl(id) {
-            return document.getElementById(id)
-        }
-        const editor = getEl("editor")
+        let my_video = document.querySelector(".my_vid");
+        let incoming_video = document.querySelector('.incomming_vid');
+        let run = document.querySelector("#run_code");
+        let lang_select = document.querySelector("#lang");
+        let output = document.querySelector(".output");
+        let editor = document.querySelector(".editor");
+        let loading_gif = document.querySelector("#loading");
+
+        let audio_off = document.querySelector('#audio-off');
+        let leave = document.querySelector('#leave');
+        let video_off = document.querySelector('#video-off');
+
 
         editor.addEventListener("keyup", (evt) => {
             const text = editor.value
-            //socket.send(text)
             socket.emit("new message", text, ROOM_ID);
         })
-
-        let my_video = document.querySelector("#my_video");
-        let incoming_video = document.querySelector('#incoming_video');
-        let run = document.querySelector("#run");
-        let lang_select = document.querySelector("#langs");
-        let output = document.querySelector("#output");
-        let loading_gif = document.querySelector("#loading");
 
         incoming_video.addEventListener('loadedmetadata', () => {
             incoming_video.play()
@@ -106,13 +185,18 @@
 
         run.onclick = () => {
             if (lang_select.value == "" || editor.value == "") {
-                alert("ERROR -> \n*****Please select a language*****\n*****Please write some code*****");
+                alert("ERROR !!! -> \n> Please select a language \n> OR Please write some code");
             }
             else {
                 loading_gif.removeAttribute('hidden');
                 //loading_gif.setAttribute('src', 'loading.gif')
                 socket.emit("code run", ROOM_ID, editor.value, lang_select[lang_select.selectedIndex].id, lang_select.value);
             }
+        }
+
+        leave.onclick = () => {
+            socket.emit('leave-meeting', ROOM_ID);
+            window.location = "http://" + window.location.host + '/end';
         }
 
         socket.on("loading", (e) => {
@@ -147,7 +231,20 @@
                     incoming_video.srcObject = answerStream;
                 })
             })
+
+            audio_off.onclick = () => {
+                stream.getAudioTracks()[0].enabled = !(stream.getAudioTracks()[0].enabled);
+            }
+
+            video_off.onclick = () => {
+                stream.getVideoTracks()[0].enabled = !(stream.getVideoTracks()[0].enabled);
+            }
+
+            socket.on('left', () => {
+                incoming_video.srcObject = undefined;
+            })
         })
+
 
         socket.on('message', (data) => {
             editor.value = data
