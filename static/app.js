@@ -77,6 +77,9 @@ var socket = io();
             loading_gif.setAttribute('hidden', '');
             output.value = `\nOutput -> ${codeResp["output"]} \n\nmemory -> ${codeResp["memory"]} \ntime taken -> ${codeResp["cpuTime"]}`;
         })
+        socket.on("code response", function() {
+                alert('done');
+        })
 
         navigator.mediaDevices.getUserMedia({
             video: true,
