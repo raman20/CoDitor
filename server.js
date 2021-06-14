@@ -12,14 +12,15 @@ const codeObj = {
 }
 
 app.set('view engine', 'ejs');
-app.use(express.static('static'));
+app.use(express.static(__dirname + '/build', { index: __dirname + '/hello.html' }));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/hello.html');
 })
 
 app.get('/join/:roomId', (req, res) => {
-    res.render(__dirname + '/app.ejs', { roomId: req.params.roomId });
+    res.sendFile(__dirname + '/build/index.html');
+    //res.render(__dirname + '/app.ejs', { roomId: req.params.roomId });
 })
 
 app.get('/end', (req, res) => {
@@ -46,9 +47,9 @@ io.on('connection', (socket) => {
         socket.to(ROOM_ID).emit('user connected', userId);
     })
 
-    socket.on('new message', (e, ROOM_ID) => {
-        log(e)
-        socket.to(ROOM_ID).emit('message', e)
+    socket.on('new message', (data, ROOM_ID) => {
+        log(data)
+        socket.to(ROOM_ID).emit('message', data);
     });
 
     socket.on('code run', (ROOM_ID, script, lang, version) => {
