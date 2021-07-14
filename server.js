@@ -20,20 +20,11 @@ app.get('/', (req, res) => {
 
 app.get('/join/:roomId', (req, res) => {
     res.sendFile(__dirname + '/build/index.html');
-    //res.render(__dirname + '/app.ejs', { roomId: req.params.roomId });
 })
 
 app.get('/end', (req, res) => {
     res.sendFile(__dirname + '/end.html');
 })
-
-/*
-// -------------------------------for ssl validation----------------------------------------
-app.get('/.well-known/pki-validation/200A76DA95C2B446602C749FBC036560.txt', (req, res) => {
-    res.sendFile(__dirname + '/200A76DA95C2B446602C749FBC036560.txt');
-})
-//------------------------------------------------------------------------------------------
-*/
 
 http.listen(port, () => {
     log(`server listening on port ${port}`);
