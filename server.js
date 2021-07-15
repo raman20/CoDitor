@@ -60,7 +60,6 @@ io.on('connection', (socket) => {
             json: codeObj
         },
             function (error, response, body) {
-                console.table(body);
                 io.in(ROOM_ID).emit('code response', body);
             });
     })
