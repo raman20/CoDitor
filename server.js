@@ -11,7 +11,6 @@ const codeObj = {
     clientSecret: "d9d9ff736afe347d80aaeb8882e822dec003109b381495fd01ce125381059df3"
 }
 
-app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/build', { index: __dirname + '/hello.html' }));
 
 app.get('/', (req, res) => {
